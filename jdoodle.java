@@ -1,5 +1,5 @@
 import java.util.*;
-class Bank Account
+class BankAccount
 {
     private String accountOwner;
     private String accountNumber;
@@ -14,17 +14,17 @@ class Bank Account
 public void deposit(double amount)
 {
     balance+=amount;
-    System.out.println("Deposite"+ amount+"New balance")
+    System.out.println("Deposite"+ amount+"New balance");
 }
 public void withdraw(double amount)
 {
     if(balance>=amount)
     {
         balance -=amount;
-        System,out,println("Withdraw"+amount+"New balance")
+        System.out.println("Withdraw"+amount+"New balance");
     }
     else
     {
-        System.out.println("Insufficent balance")
+        System.out.println("Insufficent balance");
     }
 }
