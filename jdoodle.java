@@ -1,30 +1,44 @@
-import java.util.*;
-class BankAccount
-{
-    private String accountOwner;
-    private String accountNumber;
+interface Bank {
+    void deposit(double amount);
+    void withdraw(double amount);
+}
+
+class Account implements Bank {
     private double balance;
-    public Bank Account (String accountOwner,String accountNumber)
-    {
-        this.accountOwner = accountOwner;
-        this.accountNumber = accountHolder;
-        this.balance = balance;
-        }
-}
-public void deposit(double amount)
-{
-    balance+=amount;
-    System.out.println("Deposite"+ amount+"New balance");
-}
-public void withdraw(double amount)
-{
-    if(balance>=amount)
-    {
-        balance -=amount;
-        System.out.println("Withdraw"+amount+"New balance");
+
+    public Account(double initialBalance) {
+        balance = initialBalance;
     }
-    else
-    {
-        System.out.println("Insufficent balance");
+
+
+    public void deposit(double amount) {
+        balance += amount;
+        System.out.println("Deposited: $" + amount);
+    }
+
+    
+    public void withdraw(double amount) {
+        if (balance >= amount) {
+            balance -= amount;
+            System.out.println("Withdrawn: $" + amount);
+        } else {
+            System.out.println("Insufficient funds. Withdrawal failed.");
+        }
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Account myAccount = new Account(1000.0);
+
+        myAccount.deposit(500.0);
+        myAccount.withdraw(200.0);
+        myAccount.withdraw(1500.0);
+
+        System.out.println("Current Balance: $" + myAccount.getBalance());
     }
 }
