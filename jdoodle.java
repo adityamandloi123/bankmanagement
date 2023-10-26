@@ -22,12 +22,13 @@ class Account implements Bank, Serializable {
         this.interestRate = interestRate;
     }
 
-    
+    @Override
     public void deposit(double amount) {
         balance += amount;
         System.out.println(amount + " deposited. New balance: " + balance);
     }
 
+    @Override
     public void withdraw(double amount) {
         if (balance >= amount) {
             balance -= amount;
@@ -37,13 +38,14 @@ class Account implements Bank, Serializable {
         }
     }
 
+    @Override
     public void calculateInterest() {
         double interest = balance * (interestRate / 100);
         balance += interest;
         System.out.println("Interest calculated. New balance: " + balance);
     }
 
-    
+    @Override
     public String getAccountInfo() {
         return "Account Number: " + accountNumber +
                 "\nAccount Holder: " + accountHolder +
@@ -56,7 +58,7 @@ public class BankManagementSystem {
     private static ArrayList<Account> accounts = new ArrayList<>();
 
     public static void main(String[] args) {
-        loadAccountsFromFile(); 
+        loadAccountsFromFile(); // Load accounts from file on startup
 
         Scanner scanner = new Scanner(System.in);
 
@@ -184,3 +186,4 @@ public class BankManagementSystem {
         }
     }
 }
+
