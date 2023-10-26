@@ -1,91 +1,186 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-class BankAccount {
-    private int accountNumber;
+interface Bank {
+    void deposit(double amount);
+    void withdraw(double amount);
+    void calculateInterest();
+    String getAccountInfo();
+}
+
+class Account implements Bank, Serializable {
+    private String accountNumber;
     private String accountHolder;
     private double balance;
+    private double interestRate;
 
-    public BankAccount(int accountNumber, String accountHolder, double balance) {
+    public Account(String accountNumber, String accountHolder, double balance, double interestRate) {
         this.accountNumber = accountNumber;
         this.accountHolder = accountHolder;
         this.balance = balance;
+        this.interestRate = interestRate;
     }
 
-    public int getAccountNumber() {
-        return accountNumber;
-    }
-
-    public String getAccountHolder() {
-        return accountHolder;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
+    
     public void deposit(double amount) {
         balance += amount;
+        System.out.println(amount + " deposited. New balance: " + balance);
     }
 
     public void withdraw(double amount) {
         if (balance >= amount) {
             balance -= amount;
+            System.out.println(amount + " withdrawn. New balance: " + balance);
         } else {
-            System.out.println("Insufficient funds");
+            System.out.println("Insufficient funds.");
         }
     }
 
-    public void applyInterest(double rate) {
-        balance += (balance * rate / 100);
+    public void calculateInterest() {
+        double interest = balance * (interestRate / 100);
+        balance += interest;
+        System.out.println("Interest calculated. New balance: " + balance);
+    }
+
+    
+    public String getAccountInfo() {
+        return "Account Number: " + accountNumber +
+                "\nAccount Holder: " + accountHolder +
+                "\nBalance: " + balance +
+                "\nInterest Rate: " + interestRate + "%";
     }
 }
 
 public class BankManagementSystem {
-    private ArrayList<BankAccount> accounts;
+    private static ArrayList<Account> accounts = new ArrayList<>();
 
-    public BankManagementSystem() {
-        accounts = new ArrayList<>();
+    public static void main(String[] args) {
+        loadAccountsFromFile(); 
+
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("1. Create Account\n2. Deposit\n3. Withdraw\n4. Calculate Interest\n5. Show Account Info\n6. Save Accounts to File\n7. Exit");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    createAccount(scanner);
+                    break;
+                case 2:
+                    deposit(scanner);
+                    break;
+                case 3:
+                    withdraw(scanner);
+                    break;
+                case 4:
+                    calculateInterest(scanner);
+                    break;
+                case 5:
+                    showAccountInfo(scanner);
+                    break;
+                case 6:
+                    saveAccountsToFile();
+                    break;
+                case 7:
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
     }
 
-    public void addAccount(BankAccount account) {
+    private static void createAccount(Scanner scanner) {
+        System.out.println("Enter Account Number: ");
+        String accountNumber = scanner.next();
+        System.out.println("Enter Account Holder Name: ");
+        String accountHolder = scanner.next();
+        System.out.println("Enter Initial Balance: ");
+        double balance = scanner.nextDouble();
+        System.out.println("Enter Interest Rate: ");
+        double interestRate = scanner.nextDouble();
+
+        Account account = new Account(accountNumber, accountHolder, balance, interestRate);
         accounts.add(account);
     }
 
-    public BankAccount findAccount(int accountNumber) {
-        for (BankAccount account : accounts) {
-            if (account.getAccountNumber() == accountNumber) {
-                return account;
+    private static void deposit(Scanner scanner) {
+        System.out.println("Enter Account Number: ");
+        String accNumDeposit = scanner.next();
+        System.out.println("Enter Amount to Deposit: ");
+        double amountDeposit = scanner.nextDouble();
+
+        for (Account acc : accounts) {
+            if (acc.getAccountInfo().contains(accNumDeposit)) {
+                acc.deposit(amountDeposit);
+                break;
             }
         }
-        return null;
     }
 
-    public static void main(String[] args) {
-        BankManagementSystem bank = new BankManagementSystem();
+    private static void withdraw(Scanner scanner) {
+        System.out.println("Enter Account Number: ");
+        String accNumWithdraw = scanner.next();
+        System.out.println("Enter Amount to Withdraw: ");
+        double amountWithdraw = scanner.nextDouble();
 
-        // Create accounts and add them to the bank
-        BankAccount account1 = new BankAccount(1001, "John Doe", 1000);
-        BankAccount account2 = new BankAccount(1002, "Jane Doe", 2000);
+        for (Account acc : accounts) {
+            if (acc.getAccountInfo().contains(accNumWithdraw)) {
+                acc.withdraw(amountWithdraw);
+                break;
+            }
+        }
+    }
 
-        bank.addAccount(account1);
-        bank.addAccount(account2);
+    private static void calculateInterest(Scanner scanner) {
+        System.out.println("Enter Account Number: ");
+        String accNumInterest = scanner.next();
 
-        // Deposit and withdraw from accounts
-        account1.deposit(500);
-        account2.withdraw(300);
+        for (Account acc : accounts) {
+            if (acc.getAccountInfo().contains(accNumInterest)) {
+                acc.calculateInterest();
+                break;
+            }
+        }
+    }
 
-        // Apply interest
-        account1.applyInterest(5); // 5% interest rate
-        account2.applyInterest(5); // 5% interest rate
+    private static void showAccountInfo(Scanner scanner) {
+        System.out.println("Enter Account Number: ");
+        String accNumShowInfo = scanner.next();
 
-        // Print account information
-        System.out.println("Account Number: " + account1.getAccountNumber());
-        System.out.println("Account Holder: " + account1.getAccountHolder());
-        System.out.println("Balance: $" + account1.getBalance());
+        for (Account acc : accounts) {
+            if (acc.getAccountInfo().contains(accNumShowInfo)) {
+                System.out.println(acc.getAccountInfo());
+                break;
+            }
+        }
+    }
 
-        System.out.println("Account Number: " + account2.getAccountNumber());
-        System.out.println("Account Holder: " + account2.getAccountHolder());
-        System.out.println("Balance: $" + account2.getBalance());
+    private static void saveAccountsToFile() {
+        try {
+            FileOutputStream fileOut = new FileOutputStream("accounts.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(accounts);
+            out.close();
+            fileOut.close();
+            System.out.println("Accounts saved to file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadAccountsFromFile() {
+        try {
+            FileInputStream fileIn = new FileInputStream("accounts.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            accounts = (ArrayList<Account>) in.readObject();
+            in.close();
+            fileIn.close();
+            System.out.println("Accounts loaded from file.");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
